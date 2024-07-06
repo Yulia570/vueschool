@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tasks List</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <div id="tasks-list">
+    <div class="header">
+      <h1>{{ header || 'Welcome' }}</h1>
+      <button v-if="editing" @click="doEdit(false)" class="btn btn-cancel">Cancel</button>
+      <button v-else @click="doEdit(true)" class="btn btn-primry">Add Task</button>
+    </div>
+    
+    <div v-if="editing" class="add-task-form">
+      <input 
+        @keyup.enter="saveTask" 
+        type="text" v-model="newTask" placeholder = "Add an Task">
+      <label>
+        <input type="checkbox" v-model="newTaskHighPriority">
+        High Priority
+      </label>
+      <button 
+        @click="saveTask" 
+        class="btn btn-primary">
+        Save Task
+      </button>
+    </div>
+    <p v-if="tasks.length === 0">Nice job! You've completed all the tasks on your list!</p>
+    <ul>
+      <li 
+        v-for="task in reversedTasks"
+        @click="togglePurchased(task)"
+        :key="task.id"
+        class="static-class"
+        :class="{strikeout: task.purchased, priority: task.highPriority}"
+      >
+        {{task.label}}
+      </li>
+    </ul>
+  </div>
+  <script src="https://unpkg.com/vue@3"></script>
+  <script>
+    const shoppingListApp = Vue.createApp({
+      data() {
+        return {
+          header: 'Tasks List App',
+          editing:false,
+          newTask: '',
+          newTaskHighPriority: false,
+          tasks:[
+            {id: 1, label:'Take a walk with the dog', purchased: true, highPriority: false},
+            {id: 2, label:'Go to the store', purchased: true, highPriority: false},
+            {id: 3, label:'Call my mom', purchased: false, highPriority: true},
+          ]
+        }
+      },
+      computed:{
+        reversedTasks(){
+          return [...this.tasks].reverse()
+        }
+      },
+      methods:{
+        saveTask(){
+          this.tasks.push({
+            id:this.tasks.length + 1, 
+            label: this.newTask,
+            highPriority: this.newTaskHighPriority
+          })
+          this.newTask = ""
+          this.newTaskHighPriority = false
+        },
+        doEdit(editing){
+          this.editing = editing
+          this.newTask = ""
+          this.newTaskHighPriority = false
+        },
+        togglePurchased(task){
+          task.purchased = !task.purchased
+        }
+      }
+    }).mount('#tasks-list')
+  </script>
+</body>
+</html>
